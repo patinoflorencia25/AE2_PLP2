@@ -37,5 +37,14 @@ public class Empleado extends Persona {
     public LocalDate getFechaIngreso() { 
        return fechaIngreso;
     }
+        @Override
+    public String getRol() {
+        return "Empleado";
+    }
+
+    @Override
+    public String getDatosEspecificos() {
+        return "Puesto: " + puesto + " | Salario: $" + salario + " | Ingreso: " + fechaIngreso;
+    }
 
 }

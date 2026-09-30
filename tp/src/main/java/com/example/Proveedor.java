@@ -47,5 +47,14 @@ public class Proveedor extends Persona {
     public int getCantidadProductos() {
         return cantidadProductos;
     }
+        @Override
+    public String getRol() {
+        return "Proveedor";
+    }
+
+    @Override
+    public String getDatosEspecificos() {
+        return "Razon social: " + razonSocial + " | CUIT: " + cuit + " | Productos: " + cantidadProductos;
+    }
 
 }

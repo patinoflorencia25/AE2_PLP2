@@ -40,6 +40,10 @@ public class Main {
         Pago pago1 = new Pago(factura1.calcularTotal(), LocalDate.now(), "Transferencia", "Cancelado");
         factura1.asignarPago(pago1);
  
+        // Demostracion de abstraccion: mostrarInfo() de Persona, cada rol aporta lo suyo
+        cliente1.mostrarInfo();
+        empleado1.mostrarInfo();
+        proveedor1.mostrarInfo();
         // Mostrar detalle completo de la factura
         factura1.mostrarDetalle();
     }

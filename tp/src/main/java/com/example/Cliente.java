@@ -46,4 +46,13 @@ public class Cliente extends Persona {
     public int getCantidadFacturas() {
         return cantidadFacturas;
     }
+        @Override
+    public String getRol() {
+        return "Cliente";
+    }
+
+    @Override
+    public String getDatosEspecificos() {
+        return "Categoria: " + categoria + " | Limite de credito: $" + limiteCredito;
+    }
 }
