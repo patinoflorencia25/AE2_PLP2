@@ -1,6 +1,12 @@
 package com.example;
 
-public class ItemFacturable {
+/**
+ * Clase abstracta base para todo lo que se puede facturar (Producto o Servicio).
+ * No se instancia directamente. Declara dos métodos abstractos que cada
+ * subclase implementa a su manera, y deja métodos concretos compartidos.
+ */
+
+public abstract class ItemFacturable {
 
     private String codigo;
     private String nombre;
@@ -16,6 +22,11 @@ public class ItemFacturable {
         this.proveedor = proveedor;
     }
 
+    // Métodos abstractos: cada subclase los implementa a su manera
+    public abstract String getDescripcion();
+    public abstract double getSubtotal();
+
+    // Métodos concretos compartidos por Producto y Servicio
     public String getCodigo() {
         return codigo;
     }
@@ -35,13 +46,4 @@ public class ItemFacturable {
     public Proveedor getProveedor() {
         return proveedor;
     }
-
-    public String getDescripcion() {
-        return getNombre() + " (" + getTipo() + ")";
-    }
-
-    public double getSubtotal() {
-        return getPrecio();
-    }
 }
-
