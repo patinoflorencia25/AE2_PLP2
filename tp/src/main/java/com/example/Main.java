@@ -55,5 +55,14 @@ public class Main {
         for (Imprimible imprimible : imprimibles) {
             imprimible.mostrarDetalle();
         }
+        
+        // Demostracion de la interfaz Exportable: Cliente y Factura no son parientes,
+        // pero ambos pueden convertirse en una linea de texto
+        System.out.println();
+        System.out.println("--- Demostracion de la interfaz Exportable ---");
+        Exportable[] exportables = { cliente1, factura1 };
+        for (Exportable exportable : exportables) {
+            System.out.println(exportable.aLineaTexto());
+        }
     }
 }

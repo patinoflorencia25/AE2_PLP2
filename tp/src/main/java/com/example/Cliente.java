@@ -3,8 +3,7 @@ package com.example;
 /**
  * Cliente de la empresa, asociado a un historial de facturas.
  */
-
-public class Cliente extends Persona {
+public class Cliente extends Persona implements Exportable {
 
     private static final int CAPACIDAD_HISTORIAL = 20; // Capacidad máxima del historial de facturas
     
@@ -54,5 +53,10 @@ public class Cliente extends Persona {
     @Override
     public String getDatosEspecificos() {
         return "Categoria: " + categoria + " | Limite de credito: $" + limiteCredito;
+    }
+        @Override
+    public String aLineaTexto() {
+        return getNombre() + ";" + getDNI() + ";" + categoria + ";"
+                + limiteCredito + ";" + cantidadFacturas;
     }
 }

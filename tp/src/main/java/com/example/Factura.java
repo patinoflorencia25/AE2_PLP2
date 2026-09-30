@@ -2,7 +2,7 @@ package com.example;
 
 import java.time.LocalDate;
 
-public class Factura implements Imprimible {
+public class Factura implements Imprimible, Exportable {
 
     private static final int CAPACIDAD_MAXIMA = 10;
 
@@ -57,4 +57,10 @@ public class Factura implements Imprimible {
         }
         System.out.println("Total: $" + calcularTotal());
     }
+        @Override
+    public String aLineaTexto() {
+        return numero + ";" + fechaEmision + ";" + cliente.getNombre() + ";"
+                + empleado.getNombre() + ";" + calcularTotal();
+    }
 }
+
