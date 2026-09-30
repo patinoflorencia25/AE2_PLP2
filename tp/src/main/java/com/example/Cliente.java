@@ -21,7 +21,20 @@ public class Cliente extends Persona implements Exportable {
         this.cantidadFacturas = 0;
     }
 
-    public void agregarFactura(Factura factura){
+        public void agregarFactura(Factura factura) throws LimiteCreditoExcedidoException {
+        // Total acumulado de las facturas que ya tiene el cliente
+        double totalAcumulado = 0.0;
+        for (int i = 0; i < cantidadFacturas; i++) {
+            totalAcumulado += historial[i].calcularTotal();
+        }
+        double totalNuevo = factura.calcularTotal();
+
+        if (totalAcumulado + totalNuevo > limiteCredito) {
+            throw new LimiteCreditoExcedidoException("El cliente " + getNombre()
+                    + " supera su limite de credito de $" + limiteCredito
+                    + " (acumulado: $" + totalAcumulado + " + factura nueva: $" + totalNuevo + ")");
+        }
+
         if (cantidadFacturas < historial.length) {
             historial[cantidadFacturas] = factura;
             cantidadFacturas++;

@@ -36,11 +36,21 @@ public class Main {
             factura1.agregarItem(item);
             System.out.println(item.getDescripcion() + " -> $" + item.getSubtotal());
         }
-        cliente1.agregarFactura(factura1);
- 
+                try {
+            cliente1.agregarFactura(factura1);
+        } catch (LimiteCreditoExcedidoException e) {
+            System.out.println("ERROR: " + e.getMessage());
+        }
+
         // Pago / Recibo
         Pago pago1 = new Pago(factura1.calcularTotal(), LocalDate.now(), "Transferencia", "Cancelado");
-        factura1.asignarPago(pago1);
+        try {
+            factura1.asignarPago(pago1);
+        } catch (FacturaSinItemsException e) {
+            System.out.println("ERROR: " + e.getMessage());
+        } catch (PagoExcedidoException e) {
+            System.out.println("ERROR: " + e.getMessage());
+        }
  
         // Demostracion de abstraccion: mostrarInfo() de Persona, cada rol aporta lo suyo
         cliente1.mostrarInfo();
@@ -94,6 +104,42 @@ public class Main {
         System.out.println("Orden alternativo (Comparator, por precio):");
         for (ItemFacturable item : catalogo) {
             System.out.println("  " + item.getCodigo() + " - " + item.getDescripcion() + " -> $" + item.getPrecio());
+        }
+        
+        // Demostracion de excepciones propias del dominio
+        System.out.println();
+        System.out.println("--- Demostracion de excepciones propias ---");
+
+        // 1) Factura sin items
+        Factura facturaVacia = new Factura(2, LocalDate.now(), cliente1, empleado1);
+        try {
+            facturaVacia.asignarPago(new Pago(1000.0, LocalDate.now(), "Efectivo", "Parcial"));
+        } catch (FacturaSinItemsException e) {
+            System.out.println("ERROR: " + e.getMessage());
+        } catch (PagoExcedidoException e) {
+            System.out.println("ERROR: " + e.getMessage());
+        }
+
+        // 2) Pago mayor al total adeudado
+        Factura facturaChica = new Factura(3, LocalDate.now(), cliente1, empleado1);
+        facturaChica.agregarItem(producto1);
+        try {
+            facturaChica.asignarPago(new Pago(20000.0, LocalDate.now(), "Tarjeta", "Cancelado"));
+        } catch (FacturaSinItemsException e) {
+            System.out.println("ERROR: " + e.getMessage());
+        } catch (PagoExcedidoException e) {
+            System.out.println("ERROR: " + e.getMessage());
+        }
+
+        // 3) Cliente que supera su limite de credito
+        Cliente clienteLimitado = new Cliente("Carlos Lopez", "Calle 456", "11223344",
+                "3764444444", 10000.0, "Regular");
+        Factura facturaGrande = new Factura(4, LocalDate.now(), clienteLimitado, empleado1);
+        facturaGrande.agregarItem(producto2);
+        try {
+            clienteLimitado.agregarFactura(facturaGrande);
+        } catch (LimiteCreditoExcedidoException e) {
+            System.out.println("ERROR: " + e.getMessage());
         }
     }
 

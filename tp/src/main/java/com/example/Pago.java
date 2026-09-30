@@ -15,7 +15,9 @@ public class Pago implements Imprimible {
         this.metodoPago = metodoPago;
         this.estado = estado;
     }
-
+    public double getMonto() {
+        return monto;
+    }
     @Override
     public void mostrarDetalle() {
         System.out.println("Pago -> Monto: $" + monto + " | Metodo: " + metodoPago

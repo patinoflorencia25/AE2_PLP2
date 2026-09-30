@@ -38,7 +38,16 @@ public class Factura implements Imprimible, Exportable {
         return total;
     }
 
-    public void asignarPago(Pago pago) {
+        public void asignarPago(Pago pago) throws FacturaSinItemsException, PagoExcedidoException {
+        if (cantidadItems == 0) {
+            throw new FacturaSinItemsException("No se puede registrar el pago: la factura N° "
+                    + numero + " no tiene items.");
+        }
+        double total = calcularTotal();
+        if (pago.getMonto() > total) {
+            throw new PagoExcedidoException("El pago de $" + pago.getMonto()
+                    + " supera el total adeudado de $" + total + " de la factura N° " + numero + ".");
+        }
         this.pago = pago;
     }
 
