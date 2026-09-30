@@ -141,6 +141,30 @@ public class Main {
         } catch (LimiteCreditoExcedidoException e) {
             System.out.println("ERROR: " + e.getMessage());
         }
+        
+        // Demostracion de persistencia: guardar y volver a leer archivos de texto
+        System.out.println();
+        System.out.println("--- Demostracion de persistencia ---");
+        GestorArchivos gestor = new GestorArchivos();
+
+        ArrayList<Exportable> facturasAGuardar = new ArrayList<>();
+        facturasAGuardar.add(factura1);
+        facturasAGuardar.add(facturaChica);
+        gestor.guardar("facturas.txt", facturasAGuardar);
+
+        ArrayList<Exportable> clientesAGuardar = new ArrayList<>();
+        clientesAGuardar.add(cliente1);
+        clientesAGuardar.add(clienteLimitado);
+        gestor.guardar("clientes.txt", clientesAGuardar);
+
+        System.out.println("Contenido leido de facturas.txt:");
+        for (String linea : gestor.leer("facturas.txt")) {
+            System.out.println("  " + linea);
+        }
+        System.out.println("Contenido leido de clientes.txt:");
+        for (String linea : gestor.leer("clientes.txt")) {
+            System.out.println("  " + linea);
+        }
     }
 
 }

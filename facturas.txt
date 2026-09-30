@@ -1,0 +1,2 @@
+1;2026-09-30;Maria Gomez;Juan Perez;23000.0
+3;2026-09-30;Maria Gomez;Juan Perez;15000.0
