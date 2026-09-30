@@ -2,7 +2,7 @@ package com.example;
 
 import java.time.LocalDate;
 
-public class Factura {
+public class Factura implements Imprimible {
 
     private static final int CAPACIDAD_MAXIMA = 10;
 
@@ -42,6 +42,7 @@ public class Factura {
         this.pago = pago;
     }
 
+    @Override
     public void mostrarDetalle() {
         System.out.println("===== Factura N° " + numero + " =====");
         System.out.println("Fecha de emision: " + fechaEmision);
@@ -52,7 +53,7 @@ public class Factura {
             System.out.println("  - " + items[i].getDescripcion() + " -> $" + items[i].getSubtotal());
         }
         if (pago != null) {
-            pago.mostrarInfo();
+            pago.mostrarDetalle();
         }
         System.out.println("Total: $" + calcularTotal());
     }

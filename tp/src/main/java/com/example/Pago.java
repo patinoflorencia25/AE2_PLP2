@@ -2,7 +2,7 @@ package com.example;
 
 import java.time.LocalDate;
 
-public class Pago {
+public class Pago implements Imprimible {
 
     private double monto;
     private LocalDate fecha;
@@ -16,7 +16,8 @@ public class Pago {
         this.estado = estado;
     }
 
-    public void mostrarInfo() {
+    @Override
+    public void mostrarDetalle() {
         System.out.println("Pago -> Monto: $" + monto + " | Metodo: " + metodoPago
                 + " | Estado: " + estado + " | Fecha: " + fecha);
     }

@@ -46,5 +46,14 @@ public class Main {
         proveedor1.mostrarInfo();
         // Mostrar detalle completo de la factura
         factura1.mostrarDetalle();
+        
+        // Demostracion de la interfaz Imprimible: Pago y Factura no son parientes,
+        // pero ambos pueden tratarse como Imprimible
+        System.out.println();
+        System.out.println("--- Demostracion de la interfaz Imprimible ---");
+        Imprimible[] imprimibles = { pago1, factura1 };
+        for (Imprimible imprimible : imprimibles) {
+            imprimible.mostrarDetalle();
+        }
     }
 }
