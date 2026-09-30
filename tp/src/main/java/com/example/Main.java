@@ -1,6 +1,8 @@
 package com.example;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collections;
 
 public class Main {
     public static void main(String[] args) {
@@ -64,5 +66,35 @@ public class Main {
         for (Exportable exportable : exportables) {
             System.out.println(exportable.aLineaTexto());
         }
+        
+        // Demostracion de Comparable y Comparator con Collections.sort()
+        System.out.println();
+        System.out.println("--- Demostracion de Comparable y Comparator ---");
+        Producto producto2 = new Producto("P002", "Teclado Mecanico", 25000.0, "Periferico", proveedor1);
+        Servicio servicio2 = new Servicio("S002", "Limpieza de Equipo", 5000.0, "Soporte", proveedor1);
+
+        ArrayList<ItemFacturable> catalogo = new ArrayList<>();
+        catalogo.add(servicio1);
+        catalogo.add(producto2);
+        catalogo.add(producto1);
+        catalogo.add(servicio2);
+
+        System.out.println("Lista original (sin ordenar):");
+        for (ItemFacturable item : catalogo) {
+            System.out.println("  " + item.getCodigo() + " - " + item.getDescripcion() + " -> $" + item.getPrecio());
+        }
+
+        Collections.sort(catalogo); // orden natural: Comparable (por codigo)
+        System.out.println("Orden natural (Comparable, por codigo):");
+        for (ItemFacturable item : catalogo) {
+            System.out.println("  " + item.getCodigo() + " - " + item.getDescripcion() + " -> $" + item.getPrecio());
+        }
+
+        Collections.sort(catalogo, new ComparadorPorPrecio()); // orden alternativo: Comparator (por precio)
+        System.out.println("Orden alternativo (Comparator, por precio):");
+        for (ItemFacturable item : catalogo) {
+            System.out.println("  " + item.getCodigo() + " - " + item.getDescripcion() + " -> $" + item.getPrecio());
+        }
     }
+
 }

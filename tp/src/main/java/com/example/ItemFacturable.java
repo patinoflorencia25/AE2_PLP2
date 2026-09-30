@@ -6,7 +6,7 @@ package com.example;
  * subclase implementa a su manera, y deja métodos concretos compartidos.
  */
 
-public abstract class ItemFacturable {
+public abstract class ItemFacturable implements Comparable<ItemFacturable> {
 
     private String codigo;
     private String nombre;
@@ -46,4 +46,9 @@ public abstract class ItemFacturable {
     public Proveedor getProveedor() {
         return proveedor;
     }
-}
+    // Orden natural: por código (Comparable)
+    @Override
+    public int compareTo(ItemFacturable otro) {
+        return this.codigo.compareTo(otro.getCodigo());
+    }
+    }
