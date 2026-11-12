@@ -145,7 +145,8 @@ public class Main {
         // Demostracion de persistencia: guardar y volver a leer archivos de texto
         System.out.println();
         System.out.println("--- Demostracion de persistencia ---");
-        GestorArchivos gestor = new GestorArchivos();
+        // Main es el unico lugar que elige la implementacion concreta; el resto trabaja con la interfaz
+        AlmacenamientoDatos gestor = new GestorArchivos();
 
         ArrayList<Exportable> facturasAGuardar = new ArrayList<>();
         facturasAGuardar.add(factura1);
