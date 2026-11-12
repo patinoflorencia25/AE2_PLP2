@@ -18,9 +18,14 @@ public class Pago implements Imprimible {
     public double getMonto() {
         return monto;
     }
+    // Texto del pago (lo usa tambien FormateadorFactura)
+    public String describir() {
+        return "Pago -> Monto: $" + monto + " | Metodo: " + metodoPago
+                + " | Estado: " + estado + " | Fecha: " + fecha;
+    }
+
     @Override
     public void mostrarDetalle() {
-        System.out.println("Pago -> Monto: $" + monto + " | Metodo: " + metodoPago
-                + " | Estado: " + estado + " | Fecha: " + fecha);
+        System.out.println(describir());
     }
 }

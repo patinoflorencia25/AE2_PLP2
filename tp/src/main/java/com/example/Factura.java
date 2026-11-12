@@ -1,6 +1,7 @@
 package com.example;
 
 import java.time.LocalDate;
+import java.util.Arrays;
 
 public class Factura implements Imprimible, Exportable {
 
@@ -13,6 +14,7 @@ public class Factura implements Imprimible, Exportable {
     private ItemFacturable[] items;
     private int cantidadItems;
     private Pago pago;
+    private FormateadorFactura formateador = new FormateadorFactura();
 
     public Factura(int numero, LocalDate fechaEmision, Cliente cliente, Empleado empleado) {
         this.numero = numero;
@@ -51,25 +53,41 @@ public class Factura implements Imprimible, Exportable {
         this.pago = pago;
     }
 
+    // Getters que necesita el formateador para armar los textos
+    public int getNumero() {
+        return numero;
+    }
+
+    public LocalDate getFechaEmision() {
+        return fechaEmision;
+    }
+
+    public Cliente getCliente() {
+        return cliente;
+    }
+
+    public Empleado getEmpleado() {
+        return empleado;
+    }
+
+    public Pago getPago() {
+        return pago;
+    }
+
+    // Devuelve solo los items cargados (una copia, el arreglo interno no se expone)
+    public ItemFacturable[] getItems() {
+        return Arrays.copyOf(items, cantidadItems);
+    }
+
+    // Factura sigue cumpliendo los contratos Imprimible y Exportable,
+    // pero delega en FormateadorFactura el armado de los textos
     @Override
     public void mostrarDetalle() {
-        System.out.println("===== Factura N° " + numero + " =====");
-        System.out.println("Fecha de emision: " + fechaEmision);
-        System.out.println("Cliente: " + cliente.getNombre());
-        System.out.println("Empleado que gestiono la operacion: " + empleado.getNombre());
-        System.out.println("Items:");
-        for (int i = 0; i < cantidadItems; i++) {
-            System.out.println("  - " + items[i].getDescripcion() + " -> $" + items[i].getSubtotal());
-        }
-        if (pago != null) {
-            pago.mostrarDetalle();
-        }
-        System.out.println("Total: $" + calcularTotal());
+        System.out.print(formateador.detalle(this));
     }
-        @Override
+
+    @Override
     public String aLineaTexto() {
-        return numero + ";" + fechaEmision + ";" + cliente.getNombre() + ";"
-                + empleado.getNombre() + ";" + calcularTotal();
+        return formateador.lineaArchivo(this);
     }
 }
-
