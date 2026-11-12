@@ -38,7 +38,7 @@ public class Main {
         }
                 try {
             cliente1.agregarFactura(factura1);
-        } catch (LimiteCreditoExcedidoException e) {
+        } catch (LimiteCreditoExcedidoException | HistorialLlenoException e) {
             System.out.println("ERROR: " + e.getMessage());
         }
 
@@ -138,7 +138,7 @@ public class Main {
         facturaGrande.agregarItem(producto2);
         try {
             clienteLimitado.agregarFactura(facturaGrande);
-        } catch (LimiteCreditoExcedidoException e) {
+        } catch (LimiteCreditoExcedidoException | HistorialLlenoException e) {
             System.out.println("ERROR: " + e.getMessage());
         }
         

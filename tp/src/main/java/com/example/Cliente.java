@@ -5,28 +5,21 @@ package com.example;
  */
 public class Cliente extends Persona implements Exportable {
 
-    private static final int CAPACIDAD_HISTORIAL = 20; // Capacidad máxima del historial de facturas
-    
     private double limiteCredito;
     private String categoria; // reular / premium / corporativo
-    private Factura[] historial;
-    private int cantidadFacturas; // Contador de facturas en el historial
+    private HistorialFacturas historial; // el almacenamiento de las facturas vive en su propia clase
 
     public Cliente(String nombre, String domicilio, String DNI, String telefono,
                    double limiteCredito, String categoria) {
         super(nombre, domicilio, DNI, telefono);
         this.limiteCredito = limiteCredito;
         this.categoria = categoria;
-        this.historial = new Factura[CAPACIDAD_HISTORIAL];
-        this.cantidadFacturas = 0;
+        this.historial = new HistorialFacturas();
     }
 
-        public void agregarFactura(Factura factura) throws LimiteCreditoExcedidoException {
-        // Total acumulado de las facturas que ya tiene el cliente
-        double totalAcumulado = 0.0;
-        for (int i = 0; i < cantidadFacturas; i++) {
-            totalAcumulado += historial[i].calcularTotal();
-        }
+    public void agregarFactura(Factura factura) throws LimiteCreditoExcedidoException, HistorialLlenoException {
+        // Cliente conserva solo la regla de negocio: puede comprar si no supera su limite
+        double totalAcumulado = historial.calcularTotalAcumulado();
         double totalNuevo = factura.calcularTotal();
 
         if (totalAcumulado + totalNuevo > limiteCredito) {
@@ -35,12 +28,8 @@ public class Cliente extends Persona implements Exportable {
                     + " (acumulado: $" + totalAcumulado + " + factura nueva: $" + totalNuevo + ")");
         }
 
-        if (cantidadFacturas < historial.length) {
-            historial[cantidadFacturas] = factura;
-            cantidadFacturas++;
-        } else {
-            System.out.println("No se puede agregar la factura: historial completo.");
-        }
+        // Guardar la factura es responsabilidad del historial
+        historial.agregar(factura);
     }
 
     public double getLimiteCredito() {
@@ -52,11 +41,11 @@ public class Cliente extends Persona implements Exportable {
     }
 
     public Factura[] getHistorial() {
-        return historial;
+        return historial.getFacturas();
     }
 
     public int getCantidadFacturas() {
-        return cantidadFacturas;
+        return historial.getCantidad();
     }
         @Override
     public String getRol() {
@@ -70,6 +59,6 @@ public class Cliente extends Persona implements Exportable {
         @Override
     public String aLineaTexto() {
         return getNombre() + ";" + getDNI() + ";" + categoria + ";"
-                + limiteCredito + ";" + cantidadFacturas;
+                + limiteCredito + ";" + historial.getCantidad();
     }
 }
