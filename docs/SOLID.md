@@ -1,44 +1,48 @@
 # AE4 – Revisión del diseño con principios SOLID
 
-Base común: **AE2 de Patiño Florencia** (repositorio `AE2_PLP2`, commit `36db1cf`).
-Los cambios están en la rama `solid`, con un commit por problema.
+**Base común:** AE2 de Patiño Florencia (repositorio `AE2_PLP2`, commit `36db1cf`).
+La pareja decidió usar una sola solución como base, y por eso no se integró el proyecto del compañero.
+Los cambios están en la rama `solid`, con commits separados por problema.
 
-Verificación: antes y después de cada refactorización se compiló el proyecto y se
-comparó la salida de `Main` con la de la versión original. La salida por pantalla
-(68 líneas) y los archivos `facturas.txt` y `clientes.txt` quedaron **idénticos**.
+## Cómo se verificó cada cambio
+Después de cada refactorización se compiló el proyecto (Java 17, con todas las advertencias del compilador activadas y sin ninguna)
+y se ejecutó `Main`. La salida del programa tiene las mismas 68 líneas que la versión original; solo cambiaron las tildes de los textos.
+Además se probaron aparte los casos nuevos (estructuras llenas, errores de archivo y pagos inválidos).
 
 ---
 
-## Los cinco principios en una frase (con el código de este proyecto)
+## Los cinco principios y dónde aparecen en este proyecto
 
 | Principio | Idea | En este proyecto |
 |---|---|---|
-| **S** – Responsabilidad única | Una clase, una sola razón para cambiar. | Problemas 1 y 3 (violaciones). |
-| **O** – Abierto/cerrado | Extender sin modificar código que ya funciona. | Sin `if/else` por tipo hoy, no hay violación. `GestorArchivos.guardar` ya lo cumple: acepta cualquier `Exportable`. |
-| **L** – Sustitución de Liskov | Una subclase puede usarse donde se espera la base sin romper nada. | Sin violaciones: `Producto`/`Servicio` y `Cliente`/`Empleado`/`Proveedor` respetan a su clase base. |
-| **I** – Segregación de interfaces | Interfaces chicas y específicas. | Sin violaciones: `Imprimible` y `Exportable` tienen un método y todas sus clases lo usan. |
-| **D** – Inversión de dependencias | Depender de abstracciones, no de clases concretas. | Problema 2 (violación). |
+| **S** – Responsabilidad única | Una clase debe tener una sola razón para cambiar. | **Problemas 1 y 2** (violaciones corregidas). |
+| **O** – Abierto/cerrado | Se extiende sin modificar el código que ya funciona. | Hoy no hay ningún `if/else` ni `switch` que elija comportamiento según un tipo, así que no hay violación. `GestorArchivos.guardar` ya lo cumple: guarda cualquier `Exportable`. Si se agregan descuentos por categoría de cliente o recargos por forma de pago, ahí aparecería (y encaja Strategy). |
+| **L** – Sustitución de Liskov | Una subclase se puede usar donde se espera su base sin romper nada. | Sin violaciones: `Producto` y `Servicio` cumplen el contrato de `ItemFacturable`, y `Cliente`, `Empleado` y `Proveedor` el de `Persona`. |
+| **I** – Segregación de interfaces | Interfaces chicas y específicas. | Sin violaciones: `Imprimible` y `Exportable` tienen un solo método y todas sus clases lo usan de verdad. |
+| **D** – Inversión de dependencias | Depender de abstracciones, no de clases concretas. | **Problema 3** (violación corregida). |
 
 ---
 
 ## Problema 1 – SRP en `Cliente`
 
-**Síntoma.** `Cliente.agregarFactura()` tenía tres razones para cambiar:
-la regla de crédito (negocio), el manejo del arreglo `Factura[]` (almacenamiento)
-y un `System.out.println` cuando el historial estaba lleno (salida por consola).
-Además, con el historial lleno **la factura se perdía en silencio**.
+**Síntoma.** `Cliente.agregarFactura()` tenía tres razones para cambiar: la regla de crédito (negocio),
+el manejo del arreglo `Factura[]` (almacenamiento) y un `System.out.println` cuando el historial estaba lleno
+(salida por consola). Además, con el historial lleno **la factura se perdía sin avisar**.
 
 **Antes**
 ```java
 public void agregarFactura(Factura factura) throws LimiteCreditoExcedidoException {
+    // Total acumulado de las facturas que ya tiene el cliente
     double totalAcumulado = 0.0;
     for (int i = 0; i < cantidadFacturas; i++) {
         totalAcumulado += historial[i].calcularTotal();
     }
     double totalNuevo = factura.calcularTotal();
+
     if (totalAcumulado + totalNuevo > limiteCredito) {
         throw new LimiteCreditoExcedidoException(...);
     }
+
     if (cantidadFacturas < historial.length) {
         historial[cantidadFacturas] = factura;
         cantidadFacturas++;
@@ -51,76 +55,62 @@ public void agregarFactura(Factura factura) throws LimiteCreditoExcedidoExceptio
 **Después**
 ```java
 // Cliente: solo la regla de negocio
-public void agregarFactura(Factura factura)
-        throws LimiteCreditoExcedidoException, HistorialLlenoException {
+public void agregarFactura(Factura factura) throws LimiteCreditoExcedidoException {
     double totalAcumulado = historial.calcularTotalAcumulado();
     double totalNuevo = factura.calcularTotal();
+
     if (totalAcumulado + totalNuevo > limiteCredito) {
         throw new LimiteCreditoExcedidoException(...);
     }
-    historial.agregar(factura);   // guardar es responsabilidad del historial
+
+    historial.agregar(factura); // guardar es responsabilidad del historial
+}
+
+// HistorialFacturas: arreglo, contador y total acumulado
+public void agregar(Factura factura) {
+    if (cantidad >= facturas.length) {
+        throw new CapacidadExcedidaException("No se puede agregar la factura: historial completo (20 facturas).");
+    }
+    facturas[cantidad] = factura;
+    cantidad++;
 }
 ```
-Clases nuevas: `HistorialFacturas` (arreglo, contador y total acumulado) y
-`HistorialLlenoException` (reemplaza al `println` y evita perder la factura).
+Clases nuevas: `HistorialFacturas` y `CapacidadExcedidaException`.
 
-**Qué se ganó.** Si cambia la estructura de almacenamiento (por ejemplo, pasar el arreglo
-a un `ArrayList`) se toca `HistorialFacturas` y no `Cliente`. Si cambia la política de
-crédito se toca `Cliente` y no el almacenamiento.
-**Qué se pagó.** Una clase más y una excepción más que `Main` debe capturar.
+**Qué se ganó.** Si cambia la estructura de almacenamiento (por ejemplo, pasar el arreglo a un `ArrayList`) se modifica
+`HistorialFacturas` y no `Cliente`. Si cambia la política de crédito se modifica `Cliente` y no el almacenamiento.
+Y la factura ya no se pierde sin avisar.
+**Qué se pagó.** Una clase más.
+
+**Para explicarlo en el coloquio.** Pregunta de control: ¿quién pediría un cambio en este método? El negocio (política de crédito),
+un cambio técnico (estructura de datos) y un cambio de comunicación (cómo se avisa). Tres respuestas distintas = tres responsabilidades.
+
+### Mismo patrón en otras tres clases
+El mismo defecto estaba en `Factura.agregarItem()` (perdía el ítem 11 sin avisar) y en
+`Departamento.agregarEmpleado()` y `Proveedor.agregarProducto()` (escribían por consola). Las cuatro estructuras
+ahora avisan con la misma `CapacidadExcedidaException`. Es una excepción **no verificada** (extiende `IllegalStateException`),
+igual que las colecciones con límite de Java: expresa un límite técnico de la estructura, no una regla de negocio como el
+límite de crédito, que sí es verificada.
 
 ---
 
-## Problema 2 – DIP en la persistencia
+## Problema 2 – SRP en `Factura`
 
-**Síntoma.** `Main` creaba y usaba directamente la clase concreta `GestorArchivos`
-(`new GestorArchivos()`). El resto del sistema quedaba atado a que los datos se guarden
-en archivos de texto, y no había forma de cambiar eso sin tocar a quien lo usa.
-
-**Antes**
-```java
-GestorArchivos gestor = new GestorArchivos();
-gestor.guardar("facturas.txt", facturasAGuardar);
-```
-
-**Después**
-```java
-public interface AlmacenamientoDatos {
-    void guardar(String ruta, List<Exportable> lista);
-    List<String> leer(String ruta);
-}
-
-public class GestorArchivos implements AlmacenamientoDatos { ... }
-
-// En Main (único lugar que elige la implementación concreta)
-AlmacenamientoDatos gestor = new GestorArchivos();
-```
-
-**Qué se ganó.** Quien guarda datos conoce un contrato (`AlmacenamientoDatos`) y no la
-tecnología. Cambiar a otro formato o a una base de datos es crear otra implementación.
-**Qué se pagó.** Una interfaz más. Hoy la interfaz tiene una sola implementación, por
-eso el beneficio completo aparece cuando la capa de servicio la reciba por constructor
-(ver "Coordinación").
-
----
-
-## Problema 3 – SRP en `Factura`
-
-**Síntoma.** `Factura` mezclaba tres motivos de cambio: las reglas de negocio (items,
-total, validación del pago), el texto que se muestra en pantalla y el formato de la línea
-que se guarda en archivo.
+**Síntoma.** `Factura` mezclaba tres motivos de cambio: las reglas de negocio (ítems, total, validación del pago),
+el texto que se muestra en pantalla y el formato de la línea que se guarda en archivo.
 
 **Antes**
 ```java
-@Override
 public void mostrarDetalle() {
     System.out.println("===== Factura N° " + numero + " =====");
-    ... // 10 líneas más armando el texto
+    System.out.println("Fecha de emision: " + fechaEmision);
+    ... // el resto del texto armado dentro de la factura
 }
 
 @Override
 public String aLineaTexto() {
-    return numero + ";" + fechaEmision + ";" + cliente.getNombre() + ";" + ...;
+    return numero + ";" + fechaEmision + ";" + cliente.getNombre() + ";"
+            + empleado.getNombre() + ";" + calcularTotal();
 }
 ```
 
@@ -132,50 +122,77 @@ public void mostrarDetalle() { System.out.print(formateador.detalle(this)); }
 @Override
 public String aLineaTexto() { return formateador.lineaArchivo(this); }
 ```
-Clase nueva: `FormateadorFactura`, que arma los dos textos. `Pago` pasó a tener
-`describir()`, que devuelve su texto, y `mostrarDetalle()` lo imprime.
-`Factura` sigue cumpliendo `Imprimible` y `Exportable` (requisito de la AE2).
+Clase nueva: `FormateadorFactura`, que arma los dos textos. `Pago` pasó a tener `describir()`, que devuelve su texto, y
+`mostrarDetalle()` lo imprime. `Factura` sigue cumpliendo `Imprimible` y `Exportable` (requisito de la AE2).
 
-**Qué se ganó.** Un cambio en el formato del archivo o del texto impreso se hace en
-`FormateadorFactura`; las reglas de negocio de `Factura` no se tocan.
-**Qué se pagó.** `Factura` ahora expone getters (el arreglo de items se entrega como copia)
-y `Factura` crea su propio `FormateadorFactura`. Se decidió no inyectarlo ni definirle una
-interfaz: es una ayuda interna sin detalles técnicos que cambiar (no es un archivo ni una base de
-datos) y hoy tiene una sola implementación; agregar la abstracción sería sobrediseño. Si en el
-futuro hubiera más de un formato, ahí sí convendría una interfaz y recibirlo por constructor.
+**Qué se ganó.** Un cambio en el formato del archivo o del texto impreso se hace en `FormateadorFactura`; las reglas de negocio no se tocan.
+**Qué se pagó.** `Factura` ahora expone getters (los ítems se entregan como una copia, el arreglo interno no se expone) y crea su propio `FormateadorFactura`.
+No se inyectó ni se le definió una interfaz: es una ayuda interna sin detalles técnicos que cambiar (no es un archivo ni una base de datos)
+y tiene una sola implementación, así que agregar la abstracción sería sobrediseño. Si hubiera más de un formato, ahí sí convendría.
+
+---
+
+## Problema 3 – DIP en la persistencia
+
+**Síntoma.** `Main` creaba y usaba directamente la clase concreta `GestorArchivos` (`new GestorArchivos()`), así que el resto del
+sistema quedaba atado a que los datos se guarden en archivos de texto. Además, `GestorArchivos` capturaba la `IOException` y
+escribía el error por consola: quien lo usaba nunca se enteraba de que el guardado había fallado, y la lógica no podía reaccionar.
+
+**Antes**
+```java
+GestorArchivos gestor = new GestorArchivos();
+gestor.guardar("facturas.txt", facturasAGuardar);
+
+// dentro de GestorArchivos
+} catch (IOException e) {
+    System.out.println("ERROR al guardar el archivo " + ruta + ": " + e.getMessage());
+}
+```
+
+**Después**
+```java
+public interface AlmacenamientoDatos {
+    void guardar(String ruta, List<Exportable> lista) throws PersistenciaException;
+    List<String> leer(String ruta) throws PersistenciaException;
+}
+
+public class GestorArchivos implements AlmacenamientoDatos {
+    ...
+    } catch (IOException e) {
+        throw new PersistenciaException("No se pudo guardar el archivo " + ruta + ". ...", e);
+    }
+}
+
+// En Main (único lugar que elige la implementación concreta)
+AlmacenamientoDatos gestor = new GestorArchivos();
+```
+Clases nuevas: `AlmacenamientoDatos` (interfaz) y `PersistenciaException`. `GestorArchivos` ya no escribe en consola y usa UTF-8
+(antes dependía de la configuración de cada computadora).
+
+**Por qué `PersistenciaException` y no `IOException`.** Si la interfaz declarara `IOException`, quedaría atada a los archivos, que es
+justo lo que el principio quiere evitar. La excepción propia permite cambiar la tecnología sin tocar a quien usa la interfaz.
+
+**Qué se ganó.** Quien guarda datos conoce un contrato y no la tecnología: pasar a otro formato o a una base de datos es crear otra
+implementación. Y el error llega a quien puede decidir qué hacer con él.
+**Qué se pagó.** Una interfaz y una excepción más. Hoy la interfaz tiene una sola implementación y quien la recibe es `Main`:
+el beneficio completo aparece cuando la capa de servicio la reciba por constructor (ver "Coordinación").
 
 ---
 
 ## Principios revisados sin cambios
-
-- **OCP.** No hay `if/else` ni `switch` por tipo (`categoria`, `puesto`, `metodoPago` y
-  `tipo` son datos, no comportamiento). Introducir una abstracción sin comportamiento que
-  varíe sería artificial. Si el grupo agrega descuentos por categoría o recargos por forma
-  de pago, ese es el lugar donde aplica (y donde encaja Strategy).
-- **LSP.** `Producto.getSubtotal()` y `Servicio.getSubtotal()` cumplen el contrato de
-  `ItemFacturable`; ninguna subclase restringe ni cambia reglas de su base.
+- **OCP.** No hay `if/else` ni `switch` por tipo (`categoria`, `puesto`, `metodoPago` y `tipo` son datos, no comportamiento).
+  Introducir una abstracción sin comportamiento que varíe sería artificial.
+- **LSP.** `Producto.getSubtotal()` y `Servicio.getSubtotal()` cumplen el contrato de `ItemFacturable`; ninguna subclase restringe ni cambia reglas de su base.
 - **ISP.** `Imprimible` y `Exportable` son contratos de un solo método.
 
 ## Coordinación con el compañero (capas y patrones)
-
-- **Presentación:** `Factura.mostrarDetalle()` y `Persona.mostrarInfo()` todavía imprimen
-  por consola, y la capa de presentación debería encargarse de eso. `FormateadorFactura`
-  ya arma el texto, así que puede reutilizarse.
-- **Persistencia:** la interfaz `AlmacenamientoDatos` es el contrato; la capa de servicio
-  debería recibirla por constructor y `Main` pasarle `new GestorArchivos()`.
-- **Paquetes:** conviene que mueva las clases a paquetes sobre esta rama, para no pisar
-  estos cambios.
-- **Strategy:** si se usa para descuentos o recargos, evitar contarlo dos veces como OCP.
-
-## Pendiente (no toca SOLID)
-
-- `GestorArchivos` captura la `IOException` y escribe en consola (candidato a mejorar al
-  separar capas).
-- `Factura.agregarItem()` ignora en silencio el item 11 (mismo problema que tenía el historial).
-- `Departamento.agregarEmpleado()` y `Proveedor.agregarProducto()` avisan por consola cuando su
-  arreglo está lleno, con el mismo patrón que tenía `Cliente`. No se cambió para no ampliar el
-  alcance; es el mismo arreglo (excepción en lugar de `println`) si la cátedra lo pide.
-- `Persona.mostrarInfo()`, `Pago.mostrarDetalle()` y `Factura.mostrarDetalle()` siguen
-  imprimiendo porque así lo exigen `Imprimible` y la AE2; moverlos es tema de la capa de presentación.
-- Actualizar el diagrama UML: nuevas clases `HistorialFacturas`, `HistorialLlenoException`,
-  `AlmacenamientoDatos` y `FormateadorFactura`.
+- **Persistencia:** `AlmacenamientoDatos` es el contrato. La capa de servicio debe recibirlo por constructor y `Main` pasarle `new GestorArchivos()`.
+  Cualquier clase de la capa de presentación o de servicio que lo use debe capturar `PersistenciaException`.
+- **Presentación:** `Factura.mostrarDetalle()`, `Pago.mostrarDetalle()` y `Persona.mostrarInfo()` todavía imprimen por consola porque así lo exigen
+  `Imprimible` y la AE2; moverlo es tema de la capa de presentación. `FormateadorFactura` ya arma el texto y puede reutilizarse.
+- **Errores:** `CapacidadExcedidaException` no es verificada, así que el menú de consola debe capturarla (de lo contrario el programa se cortaría).
+  `PagoInvalidoException`, `PagoExcedidoException`, `FacturaSinItemsException`, `LimiteCreditoExcedidoException` y `PersistenciaException` son verificadas.
+- **Paquetes:** conviene mover las clases a paquetes partiendo de esta rama, para no pisar estos cambios.
+- **Strategy:** si se usa para descuentos o recargos, es el caso de OCP descrito arriba; no hay que contarlo dos veces.
+- **Clases nuevas para el diagrama UML:** `HistorialFacturas`, `FormateadorFactura`, `AlmacenamientoDatos`, `CapacidadExcedidaException`,
+  `PagoInvalidoException` y `PersistenciaException`.
