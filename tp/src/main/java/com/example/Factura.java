@@ -3,6 +3,11 @@ package com.example;
 import java.time.LocalDate;
 import java.util.Arrays;
 
+/**
+ * Factura emitida a un cliente por un empleado. Agrupa ítems facturables
+ * (productos y servicios) y puede tener un pago asociado.
+ * Es Imprimible y Exportable, pero delega en FormateadorFactura el armado de los textos.
+ */
 public class Factura implements Imprimible, Exportable {
 
     private static final int CAPACIDAD_MAXIMA = 10;
@@ -14,7 +19,7 @@ public class Factura implements Imprimible, Exportable {
     private ItemFacturable[] items;
     private int cantidadItems;
     private Pago pago;
-    private FormateadorFactura formateador = new FormateadorFactura();
+    private final FormateadorFactura formateador = new FormateadorFactura();
 
     public Factura(int numero, LocalDate fechaEmision, Cliente cliente, Empleado empleado) {
         this.numero = numero;
@@ -40,10 +45,10 @@ public class Factura implements Imprimible, Exportable {
         return total;
     }
 
-        public void asignarPago(Pago pago) throws FacturaSinItemsException, PagoExcedidoException {
+    public void asignarPago(Pago pago) throws FacturaSinItemsException, PagoExcedidoException {
         if (cantidadItems == 0) {
             throw new FacturaSinItemsException("No se puede registrar el pago: la factura N° "
-                    + numero + " no tiene items.");
+                    + numero + " no tiene ítems.");
         }
         double total = calcularTotal();
         if (pago.getMonto() > total) {
@@ -74,13 +79,11 @@ public class Factura implements Imprimible, Exportable {
         return pago;
     }
 
-    // Devuelve solo los items cargados (una copia, el arreglo interno no se expone)
+    // Devuelve solo los ítems cargados (una copia: el arreglo interno no se expone)
     public ItemFacturable[] getItems() {
         return Arrays.copyOf(items, cantidadItems);
     }
 
-    // Factura sigue cumpliendo los contratos Imprimible y Exportable,
-    // pero delega en FormateadorFactura el armado de los textos
     @Override
     public void mostrarDetalle() {
         System.out.print(formateador.detalle(this));

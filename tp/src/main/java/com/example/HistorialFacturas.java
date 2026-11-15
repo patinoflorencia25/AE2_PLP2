@@ -1,14 +1,13 @@
 package com.example;
 
 /**
- * Guarda las facturas de un cliente y sabe calcular cuanto suman.
- * Su unica responsabilidad es el almacenamiento del historial (SRP):
- * la decision de si un cliente puede o no comprar mas sigue siendo de Cliente.
+ * Guarda las facturas de un cliente y sabe calcular cuánto suman.
+ * Su única responsabilidad es el almacenamiento del historial (SRP):
+ * la decisión de si un cliente puede o no comprar más sigue siendo de Cliente.
  */
-
 public class HistorialFacturas {
 
-    private static final int CAPACIDAD = 20; // Capacidad maxima del historial
+    private static final int CAPACIDAD = 20; // Capacidad máxima del historial
 
     private Factura[] facturas;
     private int cantidad; // Contador de facturas guardadas

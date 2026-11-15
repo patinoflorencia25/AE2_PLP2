@@ -5,11 +5,10 @@ import java.time.LocalDate;
 /**
  * Empleado de la empresa, asociado a un Departamento.
  */
-
 public class Empleado extends Persona {
 
     private double salario;
-    private String puesto;   // administrativo / técnico / gerente 
+    private String puesto; // administrativo / técnico / gerente
     private LocalDate fechaIngreso;
     private Departamento departamento;
 
@@ -26,7 +25,7 @@ public class Empleado extends Persona {
         return salario;
     }
 
-    public String getPuesto(){
+    public String getPuesto() {
         return puesto;
     }
 
@@ -34,10 +33,11 @@ public class Empleado extends Persona {
         return departamento;
     }
 
-    public LocalDate getFechaIngreso() { 
-       return fechaIngreso;
+    public LocalDate getFechaIngreso() {
+        return fechaIngreso;
     }
-        @Override
+
+    @Override
     public String getRol() {
         return "Empleado";
     }
@@ -46,5 +46,4 @@ public class Empleado extends Persona {
     public String getDatosEspecificos() {
         return "Puesto: " + puesto + " | Salario: $" + salario + " | Ingreso: " + fechaIngreso;
     }
-
 }

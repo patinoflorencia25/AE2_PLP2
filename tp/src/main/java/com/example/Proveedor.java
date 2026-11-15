@@ -1,21 +1,20 @@
 package com.example;
+
 /**
  * Proveedor de productos/servicios. Mantiene su catálogo mediante
- * un arreglo de capacidad fja (no colecciones de Java).
+ * un arreglo de capacidad fija (no colecciones de Java).
  */
-
-
 public class Proveedor extends Persona {
-    
+
     private static final int CAPACIDAD_PRODUCTOS = 20;
 
     private String razonSocial;
-    private String cuit; 
+    private String cuit;
     private Producto[] productos;
     private int cantidadProductos;
 
-    public Proveedor(String nombre, String domicilio, String dni, String telefono, 
-                        String razonSocial, String cuit) {
+    public Proveedor(String nombre, String domicilio, String dni, String telefono,
+                     String razonSocial, String cuit) {
         super(nombre, domicilio, dni, telefono);
         this.razonSocial = razonSocial;
         this.cuit = cuit;
@@ -47,14 +46,14 @@ public class Proveedor extends Persona {
     public int getCantidadProductos() {
         return cantidadProductos;
     }
-        @Override
+
+    @Override
     public String getRol() {
         return "Proveedor";
     }
 
     @Override
     public String getDatosEspecificos() {
-        return "Razon social: " + razonSocial + " | CUIT: " + cuit + " | Productos: " + cantidadProductos;
+        return "Razón social: " + razonSocial + " | CUIT: " + cuit + " | Productos: " + cantidadProductos;
     }
-
 }

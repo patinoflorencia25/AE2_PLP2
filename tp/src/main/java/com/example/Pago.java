@@ -2,6 +2,9 @@ package com.example;
 
 import java.time.LocalDate;
 
+/**
+ * Pago realizado sobre una factura. Es Imprimible: puede mostrarse en pantalla.
+ */
 public class Pago implements Imprimible {
 
     private double monto;
@@ -15,12 +18,14 @@ public class Pago implements Imprimible {
         this.metodoPago = metodoPago;
         this.estado = estado;
     }
+
     public double getMonto() {
         return monto;
     }
-    // Texto del pago (lo usa tambien FormateadorFactura)
+
+    // Texto del pago (lo usa también FormateadorFactura)
     public String describir() {
-        return "Pago -> Monto: $" + monto + " | Metodo: " + metodoPago
+        return "Pago -> Monto: $" + monto + " | Método: " + metodoPago
                 + " | Estado: " + estado + " | Fecha: " + fecha;
     }
 

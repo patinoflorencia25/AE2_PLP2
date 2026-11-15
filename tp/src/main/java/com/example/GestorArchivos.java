@@ -9,15 +9,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Se encarga unicamente de guardar y leer informacion en archivos de texto.
+ * Se encarga únicamente de guardar y leer información en archivos de texto.
  * Las clases del dominio no manejan archivos: solo saben convertirse en una
- * linea de texto (interfaz Exportable).
- * Es la implementacion en archivos de texto de AlmacenamientoDatos.
+ * línea de texto (interfaz Exportable).
+ * Es la implementación en archivos de texto de AlmacenamientoDatos.
  */
-
 public class GestorArchivos implements AlmacenamientoDatos {
 
-    // Guarda una linea por cada objeto Exportable de la lista
+    // Guarda una línea por cada objeto Exportable de la lista
     @Override
     public void guardar(String ruta, List<Exportable> lista) {
         try (BufferedWriter escritor = new BufferedWriter(new FileWriter(ruta))) {
@@ -31,7 +30,7 @@ public class GestorArchivos implements AlmacenamientoDatos {
         }
     }
 
-    // Lee el archivo y devuelve sus lineas
+    // Lee el archivo y devuelve sus líneas
     @Override
     public List<String> leer(String ruta) {
         List<String> lineas = new ArrayList<>();

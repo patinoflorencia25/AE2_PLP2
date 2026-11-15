@@ -6,7 +6,7 @@ package com.example;
 public class Cliente extends Persona implements Exportable {
 
     private double limiteCredito;
-    private String categoria; // reular / premium / corporativo
+    private String categoria; // regular / premium / corporativo
     private HistorialFacturas historial; // el almacenamiento de las facturas vive en su propia clase
 
     public Cliente(String nombre, String domicilio, String DNI, String telefono,
@@ -18,13 +18,13 @@ public class Cliente extends Persona implements Exportable {
     }
 
     public void agregarFactura(Factura factura) throws LimiteCreditoExcedidoException, HistorialLlenoException {
-        // Cliente conserva solo la regla de negocio: puede comprar si no supera su limite
+        // Cliente conserva solo la regla de negocio: puede comprar si no supera su límite
         double totalAcumulado = historial.calcularTotalAcumulado();
         double totalNuevo = factura.calcularTotal();
 
         if (totalAcumulado + totalNuevo > limiteCredito) {
             throw new LimiteCreditoExcedidoException("El cliente " + getNombre()
-                    + " supera su limite de credito de $" + limiteCredito
+                    + " supera su límite de crédito de $" + limiteCredito
                     + " (acumulado: $" + totalAcumulado + " + factura nueva: $" + totalNuevo + ")");
         }
 
@@ -47,16 +47,18 @@ public class Cliente extends Persona implements Exportable {
     public int getCantidadFacturas() {
         return historial.getCantidad();
     }
-        @Override
+
+    @Override
     public String getRol() {
         return "Cliente";
     }
 
     @Override
     public String getDatosEspecificos() {
-        return "Categoria: " + categoria + " | Limite de credito: $" + limiteCredito;
+        return "Categoría: " + categoria + " | Límite de crédito: $" + limiteCredito;
     }
-        @Override
+
+    @Override
     public String aLineaTexto() {
         return getNombre() + ";" + getDNI() + ";" + categoria + ";"
                 + limiteCredito + ";" + historial.getCantidad();
