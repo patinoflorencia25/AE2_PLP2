@@ -47,9 +47,7 @@ public class Main {
         Pago pago1 = new Pago(factura1.calcularTotal(), LocalDate.now(), "Transferencia", "Cancelado");
         try {
             factura1.asignarPago(pago1);
-        } catch (FacturaSinItemsException e) {
-            System.out.println("ERROR: " + e.getMessage());
-        } catch (PagoExcedidoException e) {
+        } catch (FacturaSinItemsException | PagoInvalidoException | PagoExcedidoException e) {
             System.out.println("ERROR: " + e.getMessage());
         }
 
@@ -115,9 +113,7 @@ public class Main {
         Factura facturaVacia = new Factura(2, LocalDate.now(), cliente1, empleado1);
         try {
             facturaVacia.asignarPago(new Pago(1000.0, LocalDate.now(), "Efectivo", "Parcial"));
-        } catch (FacturaSinItemsException e) {
-            System.out.println("ERROR: " + e.getMessage());
-        } catch (PagoExcedidoException e) {
+        } catch (FacturaSinItemsException | PagoInvalidoException | PagoExcedidoException e) {
             System.out.println("ERROR: " + e.getMessage());
         }
 
@@ -126,9 +122,7 @@ public class Main {
         facturaChica.agregarItem(producto1);
         try {
             facturaChica.asignarPago(new Pago(20000.0, LocalDate.now(), "Tarjeta", "Cancelado"));
-        } catch (FacturaSinItemsException e) {
-            System.out.println("ERROR: " + e.getMessage());
-        } catch (PagoExcedidoException e) {
+        } catch (FacturaSinItemsException | PagoInvalidoException | PagoExcedidoException e) {
             System.out.println("ERROR: " + e.getMessage());
         }
 

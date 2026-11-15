@@ -47,10 +47,15 @@ public class Factura implements Imprimible, Exportable {
         return total;
     }
 
-    public void asignarPago(Pago pago) throws FacturaSinItemsException, PagoExcedidoException {
+    public void asignarPago(Pago pago)
+            throws FacturaSinItemsException, PagoInvalidoException, PagoExcedidoException {
         if (cantidadItems == 0) {
             throw new FacturaSinItemsException("No se puede registrar el pago: la factura N° "
                     + numero + " no tiene ítems.");
+        }
+        if (pago.getMonto() <= 0) {
+            throw new PagoInvalidoException("El pago de $" + pago.getMonto()
+                    + " no es válido: el monto debe ser mayor a cero.");
         }
         double total = calcularTotal();
         if (pago.getMonto() > total) {
