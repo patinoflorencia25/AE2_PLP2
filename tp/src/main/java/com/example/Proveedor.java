@@ -23,12 +23,12 @@ public class Proveedor extends Persona {
     }
 
     public void agregarProducto(Producto producto) {
-        if (cantidadProductos < productos.length) {
-            productos[cantidadProductos] = producto;
-            cantidadProductos++;
-        } else {
-            System.out.println("No se puede agregar el producto: catálogo completo.");
+        if (cantidadProductos >= productos.length) {
+            throw new CapacidadExcedidaException("No se puede agregar el producto: el catálogo de "
+                    + razonSocial + " ya tiene el máximo de " + CAPACIDAD_PRODUCTOS + " productos.");
         }
+        productos[cantidadProductos] = producto;
+        cantidadProductos++;
     }
 
     public String getRazonSocial() {

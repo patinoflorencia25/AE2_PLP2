@@ -31,10 +31,12 @@ public class Factura implements Imprimible, Exportable {
     }
 
     public void agregarItem(ItemFacturable item) {
-        if (cantidadItems < items.length) {
-            items[cantidadItems] = item;
-            cantidadItems++;
+        if (cantidadItems >= items.length) {
+            throw new CapacidadExcedidaException("No se puede agregar el ítem: la factura N° "
+                    + numero + " ya tiene el máximo de " + CAPACIDAD_MAXIMA + " ítems.");
         }
+        items[cantidadItems] = item;
+        cantidadItems++;
     }
 
     public double calcularTotal() {

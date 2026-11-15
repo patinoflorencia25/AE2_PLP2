@@ -17,7 +17,7 @@ public class Cliente extends Persona implements Exportable {
         this.historial = new HistorialFacturas();
     }
 
-    public void agregarFactura(Factura factura) throws LimiteCreditoExcedidoException, HistorialLlenoException {
+    public void agregarFactura(Factura factura) throws LimiteCreditoExcedidoException {
         // Cliente conserva solo la regla de negocio: puede comprar si no supera su límite
         double totalAcumulado = historial.calcularTotalAcumulado();
         double totalNuevo = factura.calcularTotal();

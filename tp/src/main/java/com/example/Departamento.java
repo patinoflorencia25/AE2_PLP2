@@ -25,12 +25,12 @@ public class Departamento {
     }
 
     public void agregarEmpleado(Empleado empleado) {
-        if (cantidadEmpleados < empleados.length) {
-            empleados[cantidadEmpleados] = empleado;
-            cantidadEmpleados++;
-        } else {
-            System.out.println("No se puede agregar el empleado: departamento completo.");
+        if (cantidadEmpleados >= empleados.length) {
+            throw new CapacidadExcedidaException("No se puede agregar el empleado: el departamento "
+                    + nombre + " ya tiene el máximo de " + CAPACIDAD_EMPLEADOS + " empleados.");
         }
+        empleados[cantidadEmpleados] = empleado;
+        cantidadEmpleados++;
     }
 
     public String getNombre() {

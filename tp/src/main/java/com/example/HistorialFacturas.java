@@ -17,9 +17,9 @@ public class HistorialFacturas {
         this.cantidad = 0;
     }
 
-    public void agregar(Factura factura) throws HistorialLlenoException {
+    public void agregar(Factura factura) {
         if (cantidad >= facturas.length) {
-            throw new HistorialLlenoException("No se puede agregar la factura: historial completo ("
+            throw new CapacidadExcedidaException("No se puede agregar la factura: historial completo ("
                     + CAPACIDAD + " facturas).");
         }
         facturas[cantidad] = factura;
