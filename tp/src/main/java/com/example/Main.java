@@ -146,26 +146,32 @@ public class Main {
         // Demostración de persistencia: guardar y volver a leer archivos de texto
         System.out.println();
         System.out.println("--- Demostración de persistencia ---");
-        // Main es el unico lugar que elige la implementación concreta; el resto trabaja con la interfaz
+        // Main es el único lugar que elige la implementación concreta; el resto trabaja con la interfaz
         AlmacenamientoDatos gestor = new GestorArchivos();
 
-        ArrayList<Exportable> facturasAGuardar = new ArrayList<>();
-        facturasAGuardar.add(factura1);
-        facturasAGuardar.add(facturaChica);
-        gestor.guardar("facturas.txt", facturasAGuardar);
+        try {
+            ArrayList<Exportable> facturasAGuardar = new ArrayList<>();
+            facturasAGuardar.add(factura1);
+            facturasAGuardar.add(facturaChica);
+            gestor.guardar("facturas.txt", facturasAGuardar);
+            System.out.println("Se guardaron " + facturasAGuardar.size() + " registros en facturas.txt");
 
-        ArrayList<Exportable> clientesAGuardar = new ArrayList<>();
-        clientesAGuardar.add(cliente1);
-        clientesAGuardar.add(clienteLimitado);
-        gestor.guardar("clientes.txt", clientesAGuardar);
+            ArrayList<Exportable> clientesAGuardar = new ArrayList<>();
+            clientesAGuardar.add(cliente1);
+            clientesAGuardar.add(clienteLimitado);
+            gestor.guardar("clientes.txt", clientesAGuardar);
+            System.out.println("Se guardaron " + clientesAGuardar.size() + " registros en clientes.txt");
 
-        System.out.println("Contenido leido de facturas.txt:");
-        for (String linea : gestor.leer("facturas.txt")) {
-            System.out.println("  " + linea);
-        }
-        System.out.println("Contenido leido de clientes.txt:");
-        for (String linea : gestor.leer("clientes.txt")) {
-            System.out.println("  " + linea);
+            System.out.println("Contenido leído de facturas.txt:");
+            for (String linea : gestor.leer("facturas.txt")) {
+                System.out.println("  " + linea);
+            }
+            System.out.println("Contenido leído de clientes.txt:");
+            for (String linea : gestor.leer("clientes.txt")) {
+                System.out.println("  " + linea);
+            }
+        } catch (PersistenciaException e) {
+            System.out.println("ERROR: " + e.getMessage());
         }
     }
 
