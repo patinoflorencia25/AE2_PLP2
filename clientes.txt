@@ -1,2 +1,0 @@
-María Gómez;87654321;Premium;100000.0;1
-Carlos López;11223344;Regular;10000.0;0

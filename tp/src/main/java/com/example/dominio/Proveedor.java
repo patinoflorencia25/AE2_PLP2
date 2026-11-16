@@ -1,10 +1,10 @@
 package com.example.dominio;
 
-import com.example.dominio.excepcion.*;
+import com.example.dominio.excepcion.CapacidadExcedidaException;
 
 /**
  * Proveedor de productos/servicios. Mantiene su catálogo mediante
- * un arreglo de capacidad fija (no colecciones de Java).
+ * un arreglo de capacidad fija .
  */
 public class Proveedor extends Persona {
 
