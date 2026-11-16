@@ -1,4 +1,4 @@
-package com.example;
+package com.example.dominio.excepcion;
 
 /**
  * Se lanza cuando se intenta agregar un elemento a una estructura de capacidad fija

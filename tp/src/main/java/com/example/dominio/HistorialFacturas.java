@@ -1,4 +1,6 @@
-package com.example;
+package com.example.dominio;
+
+import com.example.dominio.excepcion.*;
 
 /**
  * Guarda las facturas de un cliente y sabe calcular cuánto suman.

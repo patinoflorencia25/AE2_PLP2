@@ -1,4 +1,4 @@
-package com.example;
+package com.example.dominio.excepcion;
 
 /**
  * Se lanza cuando se intenta operar con una factura que no tiene ítems.

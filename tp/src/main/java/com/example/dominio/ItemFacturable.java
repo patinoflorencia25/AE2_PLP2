@@ -1,11 +1,11 @@
-package com.example;
+package com.example.dominio;
 
 /**
  * Clase abstracta base para todo lo que se puede facturar (Producto o Servicio).
  * No se instancia directamente. Declara dos métodos abstractos que cada
  * subclase implementa a su manera, y deja métodos concretos compartidos.
  */
-public abstract class ItemFacturable implements Comparable<ItemFacturable> {
+public abstract class ItemFacturable implements Comparable<ItemFacturable>, Exportable {
 
     private String codigo;
     private String nombre;
@@ -24,6 +24,7 @@ public abstract class ItemFacturable implements Comparable<ItemFacturable> {
     // Métodos abstractos: cada subclase los implementa a su manera
     public abstract String getDescripcion();
     public abstract double getSubtotal();
+    public abstract String getClaveTipo(); // "P" producto / "S" servicio (para guardar en archivo)
 
     // Métodos concretos compartidos por Producto y Servicio
     public String getCodigo() {
@@ -44,6 +45,12 @@ public abstract class ItemFacturable implements Comparable<ItemFacturable> {
 
     public Proveedor getProveedor() {
         return proveedor;
+    }
+
+    // Formato de archivo: clave;código;nombre;precio;tipo
+    @Override
+    public String aLineaTexto() {
+        return getClaveTipo() + ";" + codigo + ";" + nombre + ";" + precio + ";" + tipo;
     }
 
     // Orden natural: por código (Comparable)

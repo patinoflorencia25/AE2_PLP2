@@ -1,4 +1,4 @@
-package com.example;
+package com.example.persistencia;
 
 /**
  * Se lanza cuando no se puede guardar o leer información (por ejemplo, un archivo

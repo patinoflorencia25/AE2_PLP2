@@ -1,4 +1,4 @@
-package com.example;
+package com.example.dominio;
 
 /**
  * Capacidad de convertirse en una línea de texto, lista para guardar en un archivo.

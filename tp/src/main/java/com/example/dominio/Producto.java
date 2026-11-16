@@ -1,4 +1,4 @@
-package com.example;
+package com.example.dominio;
 
 public class Producto extends ItemFacturable {
 
@@ -9,6 +9,11 @@ public class Producto extends ItemFacturable {
     @Override
     public String getDescripcion() {
         return "Producto: " + getNombre() + " (" + getTipo() + ")";
+    }
+
+    @Override
+    public String getClaveTipo() {
+        return "P";
     }
 
     @Override

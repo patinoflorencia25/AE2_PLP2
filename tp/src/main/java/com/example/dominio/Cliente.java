@@ -1,4 +1,6 @@
-package com.example;
+package com.example.dominio;
+
+import com.example.dominio.excepcion.*;
 
 /**
  * Cliente de la empresa, asociado a un historial de facturas.
@@ -60,7 +62,8 @@ public class Cliente extends Persona implements Exportable {
 
     @Override
     public String aLineaTexto() {
-        return getNombre() + ";" + getDNI() + ";" + categoria + ";"
-                + limiteCredito + ";" + historial.getCantidad();
+        // nombre;dni;domicilio;teléfono;categoría;límite
+        return getNombre() + ";" + getDNI() + ";" + getDomicilio() + ";" + getTelefono() + ";"
+                + categoria + ";" + limiteCredito;
     }
 }

@@ -1,7 +1,12 @@
-package com.example;
+package com.example.dominio;
+
+import com.example.dominio.excepcion.*;
 
 import java.time.LocalDate;
 import java.util.Arrays;
+
+import com.example.dominio.descuento.DescuentoStrategy;
+import com.example.dominio.descuento.SinDescuento;
 
 /**
  * Factura emitida a un cliente por un empleado. Agrupa ítems facturables
@@ -19,9 +24,16 @@ public class Factura implements Imprimible, Exportable {
     private ItemFacturable[] items;
     private int cantidadItems;
     private Pago pago;
+    private final DescuentoStrategy descuento; // Strategy: cómo se descuenta según el cliente
     private final FormateadorFactura formateador = new FormateadorFactura();
 
     public Factura(int numero, LocalDate fechaEmision, Cliente cliente, Empleado empleado) {
+        this(numero, fechaEmision, cliente, empleado, new SinDescuento());
+    }
+
+    public Factura(int numero, LocalDate fechaEmision, Cliente cliente, Empleado empleado,
+                   DescuentoStrategy descuento) {
+        this.descuento = descuento;
         this.numero = numero;
         this.fechaEmision = fechaEmision;
         this.cliente = cliente;
@@ -39,12 +51,26 @@ public class Factura implements Imprimible, Exportable {
         cantidadItems++;
     }
 
-    public double calcularTotal() {
+    // Suma de los subtotales de los ítems, sin descuento
+    public double calcularSubtotal() {
         double total = 0.0;
         for (int i = 0; i < cantidadItems; i++) {
             total += items[i].getSubtotal();
         }
         return total;
+    }
+
+    // El cálculo concreto lo decide la estrategia (Strategy)
+    public double calcularDescuento() {
+        return descuento.calcularDescuento(calcularSubtotal());
+    }
+
+    public double calcularTotal() {
+        return calcularSubtotal() - calcularDescuento();
+    }
+
+    public DescuentoStrategy getDescuento() {
+        return descuento;
     }
 
     public void asignarPago(Pago pago)

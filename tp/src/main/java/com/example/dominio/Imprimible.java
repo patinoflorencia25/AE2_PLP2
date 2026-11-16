@@ -1,4 +1,4 @@
-package com.example;
+package com.example.dominio;
 
 /**
  * Capacidad de mostrarse en pantalla.

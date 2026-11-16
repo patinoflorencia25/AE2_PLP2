@@ -1,4 +1,6 @@
-package com.example;
+package com.example.persistencia;
+
+import com.example.dominio.Exportable;
 
 import java.io.BufferedWriter;
 import java.io.IOException;

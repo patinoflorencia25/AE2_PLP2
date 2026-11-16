@@ -1,4 +1,4 @@
-package com.example;
+package com.example.dominio.excepcion;
 
 /**
  * Se lanza cuando un pago supera el total adeudado de la factura.
