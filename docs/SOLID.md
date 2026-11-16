@@ -8,6 +8,7 @@ Los cambios están en la rama `solid`, con commits separados por problema.
 Después de cada refactorización se compiló el proyecto (Java 17, con todas las advertencias del compilador activadas y sin ninguna)
 y se ejecutó `Main`. La salida del programa tiene las mismas 68 líneas que la versión original; solo cambiaron las tildes de los textos.
 Además se probaron aparte los casos nuevos (estructuras llenas, errores de archivo y pagos inválidos).
+La versión final, con capas y patrones, se probó ejecutando el menú completo con entradas simuladas: casos válidos y de error, guardar, cerrar el programa y recuperar los datos en una ejecución nueva.
 
 ---
 
@@ -16,7 +17,7 @@ Además se probaron aparte los casos nuevos (estructuras llenas, errores de arch
 | Principio | Idea | En este proyecto |
 |---|---|---|
 | **S** – Responsabilidad única | Una clase debe tener una sola razón para cambiar. | **Problemas 1 y 2** (violaciones corregidas). |
-| **O** – Abierto/cerrado | Se extiende sin modificar el código que ya funciona. | Hoy no hay ningún `if/else` ni `switch` que elija comportamiento según un tipo, así que no hay violación. `GestorArchivos.guardar` ya lo cumple: guarda cualquier `Exportable`. Si se agregan descuentos por categoría de cliente o recargos por forma de pago, ahí aparecería (y encaja Strategy). |
+| **O** – Abierto/cerrado | Se extiende sin modificar el código que ya funciona. | Hoy no hay ningún `if/else` ni `switch` que elija comportamiento según un tipo, así que no hay violación. `GestorArchivos.guardar` ya lo cumple: guarda cualquier `Exportable`. Con los descuentos por categoría de cliente sí apareció la necesidad, y se resolvió con el patrón Strategy (`DescuentoStrategy`, ver `docs/ARQUITECTURA_Y_PATRONES.md`). |
 | **L** – Sustitución de Liskov | Una subclase se puede usar donde se espera su base sin romper nada. | Sin violaciones: `Producto` y `Servicio` cumplen el contrato de `ItemFacturable`, y `Cliente`, `Empleado` y `Proveedor` el de `Persona`. |
 | **I** – Segregación de interfaces | Interfaces chicas y específicas. | Sin violaciones: `Imprimible` y `Exportable` tienen un solo método y todas sus clases lo usan de verdad. |
 | **D** – Inversión de dependencias | Depender de abstracciones, no de clases concretas. | **Problema 3** (violación corregida). |
@@ -174,8 +175,7 @@ justo lo que el principio quiere evitar. La excepción propia permite cambiar la
 
 **Qué se ganó.** Quien guarda datos conoce un contrato y no la tecnología: pasar a otro formato o a una base de datos es crear otra
 implementación. Y el error llega a quien puede decidir qué hacer con él.
-**Qué se pagó.** Una interfaz y una excepción más. Hoy la interfaz tiene una sola implementación y quien la recibe es `Main`:
-el beneficio completo aparece cuando la capa de servicio la reciba por constructor (ver "Coordinación").
+**Qué se pagó.** Una interfaz y una excepción más. Con la arquitectura en capas, `SistemaFacturacion` (capa de servicio) recibe `AlmacenamientoDatos` por constructor y `Main` solo elige la implementación concreta (`new SistemaFacturacion(new GestorArchivos())`). Así la lógica del negocio ya no depende de cómo se guardan los datos.
 
 ---
 
@@ -185,14 +185,11 @@ el beneficio completo aparece cuando la capa de servicio la reciba por construct
 - **LSP.** `Producto.getSubtotal()` y `Servicio.getSubtotal()` cumplen el contrato de `ItemFacturable`; ninguna subclase restringe ni cambia reglas de su base.
 - **ISP.** `Imprimible` y `Exportable` son contratos de un solo método.
 
-## Coordinación con el compañero (capas y patrones)
-- **Persistencia:** `AlmacenamientoDatos` es el contrato. La capa de servicio debe recibirlo por constructor y `Main` pasarle `new GestorArchivos()`.
-  Cualquier clase de la capa de presentación o de servicio que lo use debe capturar `PersistenciaException`.
-- **Presentación:** `Factura.mostrarDetalle()`, `Pago.mostrarDetalle()` y `Persona.mostrarInfo()` todavía imprimen por consola porque así lo exigen
-  `Imprimible` y la AE2; moverlo es tema de la capa de presentación. `FormateadorFactura` ya arma el texto y puede reutilizarse.
-- **Errores:** `CapacidadExcedidaException` no es verificada, así que el menú de consola debe capturarla (de lo contrario el programa se cortaría).
-  `PagoInvalidoException`, `PagoExcedidoException`, `FacturaSinItemsException`, `LimiteCreditoExcedidoException` y `PersistenciaException` son verificadas.
-- **Paquetes:** conviene mover las clases a paquetes partiendo de esta rama, para no pisar estos cambios.
-- **Strategy:** si se usa para descuentos o recargos, es el caso de OCP descrito arriba; no hay que contarlo dos veces.
-- **Clases nuevas para el diagrama UML:** `HistorialFacturas`, `FormateadorFactura`, `AlmacenamientoDatos`, `CapacidadExcedidaException`,
-  `PagoInvalidoException` y `PersistenciaException`.
+## Integración con las capas y los patrones
+Con la versión final del proyecto, lo que había quedado para coordinar se resolvió así:
+- **Persistencia:** `SistemaFacturacion` recibe `AlmacenamientoDatos` por constructor y el menú captura `PersistenciaException`.
+- **Presentación:** el menú de consola es la capa de presentación. `Factura.mostrarDetalle()`, `Pago.mostrarDetalle()` y `Persona.mostrarInfo()` siguen imprimiendo porque así lo exigen `Imprimible` y la AE2; el menú usa `FormateadorFactura` para mostrar las facturas.
+- **Errores:** el menú captura todos los errores esperados, incluida `CapacidadExcedidaException` (no verificada), y muestra el mensaje sin cortar el programa.
+- **Paquetes:** el proyecto quedó dividido en `presentacion`, `servicio`, `dominio` (con `descuento`, `fabrica` y `excepcion`) y `persistencia`.
+- **Strategy:** resuelve los descuentos por categoría, que era el caso de OCP que había quedado abierto; no se cuenta como un problema de SOLID aparte.
+- **Clases nuevas de esta parte para el diagrama UML:** `HistorialFacturas`, `FormateadorFactura`, `AlmacenamientoDatos`, `CapacidadExcedidaException`, `PagoInvalidoException` y `PersistenciaException`.
